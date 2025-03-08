@@ -1,0 +1,607 @@
+ loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+
+    local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+    local Window =
+        Rayfield:CreateWindow(
+        {
+            Name = "Signal.tf",
+            Icon = 0,
+            LoadingTitle = "Signal.tf",
+            LoadingSubtitle = "by Signal",
+            Theme = "Default",
+            DisableRayfieldPrompts = true,
+            DisableBuildWarnings = false,
+            ConfigurationSaving = {
+                Enabled = true,
+                FolderName = "SignalHub"
+            }
+        }
+    )
+
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("Part") and obj.Name == "Part" then
+            local killScript = obj:FindFirstChild("Kill")
+
+            if killScript and killScript:IsA("Script") then
+                local position = obj.Position
+                local size = obj.Size
+
+                obj:Destroy()
+            end
+        end
+    end
+
+    local part = Instance.new("Part", workspace)
+    part.Material = Enum.Material.ForceField
+    part.Color = Color3.fromRGB(255, 0, 255)
+    part.CFrame = CFrame.new(0, -8.1, 0)
+    part.Size = Vector3.new(5000, 16, 5000)
+    part.Transparency = 0.5
+    part.Anchored = true
+    part.Name = "Signal's Platform"
+    part.Parent = nil
+
+    local Players = game:GetService("Players")
+    local player = game.Players.LocalPlayer
+    local teleportService = game:GetService("TeleportService")
+    local vc_inter = game:GetService("VoiceChatInternal")
+    local vc_service = game:GetService("VoiceChatService")
+    local StarterGui = game:GetService("StarterGui")
+
+    local Tabs = {}
+
+    Tabs["Main"] = Window:CreateTab("Main", "home")
+    Tabs["World"] = Window:CreateTab("World", "earth")
+    Tabs["Misc"] = Window:CreateTab("Misc", "clapperboard")
+    Tabs["Stalls"] = Window:CreateTab("Stalls", "clapperboard")
+    Tabs["Lag Server"] = Window:CreateTab("Lag Server", "clapperboard")
+
+    local deletedParts = {}
+    local Sections = {}
+
+    Sections["Character"] = Tabs["Main"]:CreateSection("Character")
+
+    Tabs["Main"]:CreateSlider(
+        {
+            Name = "WalkSpeed",
+            Range = {0, 100},
+            Increment = 1,
+            Suffix = "Speed",
+            CurrentValue = 16,
+            Flag = "WalkSpeedSlider",
+            Callback = function(Value)
+                game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+            end
+        }
+    )
+
+    Tabs["Main"]:CreateButton(
+        {
+            Name = "Change Character",
+            CurrentValue = false,
+            Flag = "ChangeAvatar",
+            Callback = function()
+                game:GetService("ReplicatedStorage"):WaitForChild("ToggleDisallowEvent"):FireServer()
+
+                local player = game.Players.LocalPlayer
+
+                local args = {player.Name}
+
+                game:GetService("ReplicatedStorage"):WaitForChild("ModifyUserEvent"):FireServer(unpack(args))
+
+                game:GetService("ReplicatedStorage"):WaitForChild("ToggleDisallowEvent"):FireServer()
+            end
+        }
+    )
+
+    local Players = game:GetService("Players")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+    local ModifyUsername_upvr = ReplicatedStorage:WaitForChild("ModifyUsername")
+    local lastModifiedUsername = nil
+
+    Tabs["Main"]:CreateInput(
+        {
+            Name = "Copy Avatar",
+            CurrentValue = "",
+            PlaceholderText = "Enter Username",
+            RemoveTextAfterFocusLost = true,
+            Flag = "UsernameInput",
+            Callback = function(Text)
+                if Text and Text ~= "" then
+                    ModifyUsername_upvr:FireServer(Text)
+                end
+            end
+        }
+    )
+
+    local Sections2 = {}
+
+    Sections2["Other(wip)"] = Tabs["Main"]:CreateSection("Other(wip)")
+
+    local coord1 = Vector3.new(4243, 3, 44)
+    local coord2 = Vector3.new(4199, 3, 77)
+
+    local midpoint = (coord1 + coord2) / 2
+
+    local size = Vector3.new(math.abs(coord1.X - coord2.X), 1, math.abs(coord1.Z - coord2.Z))
+
+    local part
+
+    local function createPart()
+        part = Instance.new("Part")
+        part.Name = "Solid-Private-Room"
+        part.Size = size
+        part.Position = midpoint
+        part.Anchored = true
+        part.BrickColor = BrickColor.new("Bright blue")
+        part.Material = Enum.Material.SmoothPlastic
+        part.Transparency = 1
+        part.Parent = workspace
+    end
+
+    local function togglePart()
+        if part then
+            part:Destroy()
+            part = nil
+        else
+            createPart()
+        end
+    end
+
+    Sections["Game"] = Tabs["Misc"]:CreateSection("Misc")
+
+    Tabs["Misc"]:CreateToggle(
+        {
+            Name = "Solid Private Room",
+            Callback = function()
+                togglePart()
+            end
+        }
+    )
+
+    local baseplate = nil
+    local borders = {}
+
+    local function createBorder(sizeX, sizeZ, posX, posZ)
+        local border = Instance.new("Part")
+        border.Size = Vector3.new(sizeX, 0.5, sizeZ)
+        border.Position = Vector3.new(posX, -8.1 + 16 / 2, posZ)
+        border.Anchored = true
+        border.Color = Color3.fromRGB(255, 0, 0)
+        border.Material = Enum.Material.Neon
+        border.Parent = game.Workspace
+        table.insert(borders, border)
+    end
+
+    local function createBaseplate()
+        if baseplate then
+            return
+        end
+
+        baseplate = Instance.new("Part")
+        baseplate.Size = Vector3.new(5000, 16, 5000)
+        baseplate.Position = Vector3.new(0, -8.1, 0)
+        baseplate.Anchored = true
+        baseplate.Transparency = 1
+        baseplate.CanCollide = true
+        baseplate.Material = Enum.Material.SmoothPlastic
+        baseplate.Color = Color3.fromRGB(0, 0, 0)
+        baseplate.Parent = game.Workspace
+
+        local edgeSize = baseplate.Size.X / 2
+
+        createBorder(1, baseplate.Size.Z, -edgeSize, 0)
+        createBorder(1, baseplate.Size.Z, edgeSize, 0)
+        createBorder(baseplate.Size.X, 1, 0, -edgeSize)
+        createBorder(baseplate.Size.X, 1, 0, edgeSize)
+    end
+
+    local function removeBaseplate()
+        if baseplate then
+            baseplate:Destroy()
+            baseplate = nil
+        end
+
+        for _, border in pairs(borders) do
+            border:Destroy()
+        end
+        borders = {}
+    end
+
+    Tabs["Misc"]:CreateToggle(
+        {
+            Name = "Antivoid",
+            CurrentValue = false,
+            Flag = "PlatformToggleFlag",
+            Callback = function(State)
+                if State then
+                    createBaseplate()
+                else
+                    removeBaseplate()
+                end
+            end
+        }
+    )
+
+    local toggleState = false
+
+    Tabs["Misc"]:CreateToggle(
+        {
+            Name = "Antisit",
+            Callback = function()
+                toggleState = not toggleState
+
+                for _, seat in workspace:GetDescendants() do
+                    if seat:IsA("Seat") then
+                        seat.Disabled = toggleState
+                    end
+                end
+            end
+        }
+    )
+
+    local Players = game:GetService("Players")
+    local player = Players.LocalPlayer
+    local respawnEnabled = false
+
+    local UserInputService = game:GetService("UserInputService")
+
+    local Players = game:GetService("Players")
+    local player = Players.LocalPlayer
+    local respawnEnabled = false
+    local lastDeathPosition = nil
+
+    Tabs["Misc"]:CreateToggle(
+        {
+            Name = "Respawn Point",
+            Default = false,
+            Callback = function(state)
+                respawnEnabled = state
+            end
+        }
+    )
+
+    local function onCharacterDied()
+        if not respawnEnabled then
+            return
+        end
+
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            lastDeathPosition = character.HumanoidRootPart.Position
+        end
+    end
+
+    local function onCharacterAdded(newCharacter)
+        newCharacter:WaitForChild("Humanoid").Died:Connect(onCharacterDied)
+
+        if respawnEnabled and lastDeathPosition then
+            local rootPart = newCharacter:WaitForChild("HumanoidRootPart")
+            rootPart.CFrame = CFrame.new(lastDeathPosition)
+        end
+    end
+
+    player.CharacterAdded:Connect(onCharacterAdded)
+
+    if player.Character then
+        onCharacterAdded(player.Character)
+    end
+
+    Sections["Teleports"] = Tabs["World"]:CreateSection("Teleports")
+
+    local player = game.Players.LocalPlayer
+
+    local teleportLocations = {
+        {Name = "Home", Position = Vector3.new(202.7, 40.87, 62.43)},
+        {Name = "Hot Tub", Position = Vector3.new(9999.03, 10053.98, 10015.86)},
+        {Name = "Diddy Party", Position = Vector3.new(10012.2, 10036.4, 10001.4)}
+    }
+
+    local function teleportToLocation(location)
+        if location then
+            player.Character:SetPrimaryPartCFrame(CFrame.new(location.Position))
+        else
+            warn("Location not found!")
+        end
+    end
+
+    for _, location in ipairs(teleportLocations) do
+        Tabs["World"]:CreateButton(
+            {
+                Name = "Teleport to " .. location.Name,
+                Callback = function()
+                    teleportToLocation(location)
+                end
+            }
+        )
+    end
+
+    Sections["Teleports 2"] = Tabs["World"]:CreateSection("Teleports 2")
+
+    local player = game.Players.LocalPlayer
+
+    local teleportLocations = {
+        {Name = "Donutshop", Position = Vector3.new(-77, 3.74, -80)},
+        {Name = "Stalls", Position = Vector3.new(140, 5, 74)},
+        {Name = "Toilets", Position = Vector3.new(-92, 5, 85)},
+        {Name = "Circle", Position = Vector3.new(26, 8, 86)},
+        {Name = "Tower", Position = Vector3.new(58, 313, 223)},
+        {Name = "Inside Privateroom", Position = Vector3.new(4220, 6, 60)},
+        {Name = "Outside Privateroom", Position = Vector3.new(4223, 24, 60)}
+    }
+
+    local function teleportToLocation(location)
+        if location then
+            player.Character:SetPrimaryPartCFrame(CFrame.new(location.Position))
+        else
+            warn("Location not found!")
+        end
+    end
+
+    for _, location in ipairs(teleportLocations) do
+        Tabs["World"]:CreateButton(
+            {
+                Name = "Teleport to " .. location.Name,
+                Callback = function()
+                    teleportToLocation(location)
+                end
+            }
+        )
+    end
+
+    local function teleportToLocation(location)
+        if location then
+            player.Character:SetPrimaryPartCFrame(CFrame.new(location.Position))
+        else
+            warn("Location not found!")
+        end
+    end
+
+    for _, location in ipairs(teleportLocations) do
+        Tabs["World"]:CreateButton(
+            {
+                Name = "Teleport to " .. location.Name,
+                Callback = function()
+                    teleportToLocation(location)
+                end
+            }
+        )
+    end
+
+    local function teleportToGame(placeId)
+        teleportService:Teleport(placeId, player)
+    end
+
+    Sections["Server"] = Tabs["Misc"]:CreateSection("Server")
+
+    Tabs["Misc"]:CreateButton(
+        {
+            Name = "Rejoin Server",
+            Callback = function()
+                local placeId = game.PlaceId
+                local jobId = game.JobId
+                teleportService:TeleportToPlaceInstance(placeId, jobId, player)
+            end
+        }
+    )
+
+    Tabs["Misc"]:CreateButton(
+        {
+            Name = "Server Hop",
+            Callback = function()
+                local TeleportService = game:GetService("TeleportService")
+                local HttpService = game:GetService("HttpService")
+
+                local Servers =
+                    "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
+                local Server, Next = nil, nil
+                local function ListServers(cursor)
+                    local Raw = game:HttpGet(Servers .. ((cursor and "&cursor=" .. cursor) or ""))
+                    return HttpService:JSONDecode(Raw)
+                end
+
+                repeat
+                    local Servers = ListServers(Next)
+                    Server = Servers.data[math.random(1, (#Servers.data / 3))]
+                    Next = Servers.nextPageCursor
+                until Server
+
+                if Server.playing < Server.maxPlayers and Server.id ~= game.JobId then
+                    TeleportService:TeleportToPlaceInstance(game.PlaceId, Server.id, game.Players.LocalPlayer)
+                end
+            end
+        }
+    )
+
+    Sections["Stalls"] = Tabs["Stalls"]:CreateSection("Stalls")
+
+    Tabs["Stalls"]:CreateButton(
+        {
+            Name = "Stall Stealer",
+            Callback = function()
+                local isToggled = true
+
+                local function setProximityPromptSettings(stall, enabled)
+                    local ProximityPrompt =
+                        stall:FindFirstChild("Activate") and
+                        stall:FindFirstChild("Activate"):FindFirstChildOfClass("ProximityPrompt")
+                    if ProximityPrompt then
+                        ProximityPrompt.Enabled = true
+                        ProximityPrompt.ClickablePrompt = true
+                        if enabled then
+                            ProximityPrompt.MaxActivationDistance = 15
+                            ProximityPrompt.RequiresLineOfSight = false
+                            ProximityPrompt.HoldDuration = 0
+                        else
+                            ProximityPrompt.MaxActivationDistance = 10
+                            ProximityPrompt.RequiresLineOfSight = true
+                            ProximityPrompt.HoldDuration = 1
+                        end
+                    end
+                end
+
+                local function updateBoothProximityPrompts()
+                    local Folder = game.Workspace:FindFirstChild("Booth")
+                    if not Folder then
+                        return
+                    end
+
+                    for _, stallName in ipairs({"Booth01", "Booth02", "Booth03", "Booth04", "Booth05"}) do
+                        local stall = Folder:FindFirstChild(stallName)
+                        if stall then
+                            setProximityPromptSettings(stall, isToggled)
+                        end
+                    end
+                end
+
+                local function continuouslyApplyProximityPromptSettings()
+                    while true do
+                        updateBoothProximityPrompts()
+                        wait(1)
+                    end
+                end
+
+                local function setup()
+                    spawn(continuouslyApplyProximityPromptSettings)
+                end
+
+                setup()
+            end
+        }
+    )
+
+Tabs["Lag Server"]:CreateToggle({
+    Name = "Lag switch (make sure you have floating donut)",
+    Callback = function(state)
+        
+        local function AutoModify()
+            local menu = game:GetService("Players").LocalPlayer.PlayerGui.Menu.Background.ModifyUser.EnterUsername
+            local Enter_upvr = menu.Enter
+            local ModifyUsername_upvr = game.ReplicatedStorage:WaitForChild("ModifyUsername")
+            local Players = game:GetService("Players")
+            local plr = Players.LocalPlayer
+
+            local function change()
+                local Text = "Izakf166" 
+                if Text and Text ~= "" then
+                    ModifyUsername_upvr:FireServer(Text)
+                else
+                    print("Please enter a username.")
+                end
+            end
+
+            
+            change()
+        end
+
+        AutoModify()
+
+        
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+
+        local function hasAuraInName(accessory)
+            return accessory.Name:lower():find("aura") ~= nil
+        end
+
+        local function isAccessoryOnHeadOrAbove(accessory)
+            local handle = accessory:FindFirstChild("Handle")
+            if handle then
+                if handle.Parent and handle.Parent.Name == "Head" then
+                    return true
+                end
+            end
+
+            local attachment = accessory:FindFirstChildWhichIsA("Attachment")
+            if attachment and attachment.Parent and attachment.Parent.Name == "Head" then
+                return true
+            end
+
+            if accessory.Parent and accessory.Parent:IsA("Model") then
+                local head = accessory.Parent:FindFirstChild("Head")
+                if head and handle then
+                    if handle.Position.Y >= head.Position.Y then
+                        return true
+                    end
+                end
+            end
+
+            return false
+        end
+
+        local function isMeshOnHeadOrAbove(item)
+            if item:IsA("MeshPart") and item.Parent and item.Parent.Name == "Head" then
+                return true
+            end
+
+            if item.Parent and item.Parent:IsA("Model") then
+                local head = item.Parent:FindFirstChild("Head")
+                if head and item.Position.Y >= head.Position.Y then
+                    return true
+                end
+            end
+            return false
+        end
+
+        local function removeLayeredClothing(character)
+            if not character then return end
+
+            for _, item in pairs(character:GetChildren()) do
+                if item:IsA("Accessory") and hasAuraInName(item) then
+                    if not isAccessoryOnHeadOrAbove(item) then
+                        item:Destroy()
+                    end
+                elseif item:IsA("Clothing") and item:FindFirstChild("Handle") then
+                    local handle = item.Handle
+                    if handle:IsA("MeshPart") then
+                        if not isMeshOnHeadOrAbove(handle) then
+                            item:Destroy()
+                        end
+                    end
+                end
+            end
+        end
+
+        local function continuouslyCheckClothing()
+            while state do
+                for _, player in pairs(Players:GetPlayers()) do
+                    if player.Character then
+                        removeLayeredClothing(player.Character)
+                    end
+                end
+                
+                Players.PlayerAdded:Connect(function(player)
+                    player.CharacterAdded:Connect(function(character)
+                        task.wait(0.5)
+                        removeLayeredClothing(character)
+                    end)
+                end)
+
+                task.wait(1)
+            end
+        end
+
+        if state then
+            spawn(continuouslyCheckClothing)
+        else
+            game:GetService("ReplicatedStorage"):WaitForChild("ToggleDisallowEvent"):FireServer()
+            local player = game.Players.LocalPlayer
+            local args = {player.Name}
+            game:GetService("ReplicatedStorage"):WaitForChild("ModifyUserEvent"):FireServer(unpack(args))
+            game:GetService("ReplicatedStorage"):WaitForChild("ToggleDisallowEvent"):FireServer()
+        end
+    end
+})
+
+Tabs["Lag Server"]:CreateButton({
+    Name = "Anti-lag",
+    Callback = function()
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and string.lower(obj.Name):find("gradientdonut") then
+                obj:Destroy()
+            end
+        end
+    end
+})
