@@ -722,7 +722,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/
             Callback = function()
                 loadstring(
                     game:HttpGet(
-                        "https://raw.githubusercontent.com/headingforafterlife/Roblox/refs/heads/main/Facefuck"
+                        "https://raw.githubusercontent.com/nomercy0000/face-fuck/refs/heads/main/mic%20up"
                     )
                 )()
             end
